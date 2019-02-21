@@ -4,6 +4,7 @@ import sys
 import scandir
 import pefile
 import ArgumentParser
+import binascii
 
 # code for scanning files in directory
 # if os.path.isdir(args.file):
@@ -24,7 +25,15 @@ def main():
     print("Executable: " + str(check_executable(last_section)))
 
     if(check_writeable(last_section) and check_executable(last_section)): #Checks to see if last section is writeable and executable
-        print(last_section)
+        hex = binascii.hexlify(last_section.get_data())
+
+        split_hex = hex.split('')
+
+        contiguous_count = 0
+
+
+
+
     else:
         exit()
 
@@ -47,7 +56,9 @@ def parse_arguments():
 
     parser.add_argument("-f", "--file", dest="filename",
                         help="Specify file to be scanned", metavar="FILE")
-
+    parser.add_argument("-b", "--buffer", dest="buffer",
+                  help="Specifies how many 0's to look for default is ", metavar="BUFFER") # TODO - DETERMINE DEFAULT NUMBER OF ZEROS & SET DEFAULT NUMBER
+    #TODO ADD HELP TEXT
     args = parser.parse_args()
 
     return args
