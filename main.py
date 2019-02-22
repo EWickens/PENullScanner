@@ -1,41 +1,47 @@
 import argparse
+import csv
 import os
 import sys
-import scandir
-import pefile
-import ArgumentParser
-import binascii
 
+import pefile
 
 # code for scanning files in directory
 # if os.path.isdir(args.file):
 #         for root, dirs, files in scandir.walk(args.file):
 #             for file in files:
+import rules as rules
+
+buffer_size = 800
+
 
 def main():
-    DEFAULT_BUFFER_SIZE = 800
-
     args = parse_arguments()  # Parses args for arguments
-
-    file = args.filename
+    print("\n=================================================================")
+    print("Processing files, if specified, results will be in the output CSV")
+    print("      Default buffer size is 800 null bytes, -b to modify")
+    print("=================================================================\n")
+    if len(args.dir) < 1:
+        file = args.filename
+        file_handler(file, args)
+    else:
+        CSV_handler(args)
 
     if args.buffer > 0:
-        buffer_size = args.buffer
-    else:
-        buffer_size = DEFAULT_BUFFER_SIZE
+        buffer_size.this = args.buffer
 
+
+def file_handler(file, args):
     pe = pefile.PE(file)  # Takes the filename from command line argument and loads PE file
     num_sections = pe.FILE_HEADER.NumberOfSections
 
-    verbose = False
-
-    if args.verbose:
-        verbose = True
-
     last_section = pe.sections[num_sections - 1]  # gets the last section
-    result = check_for_null(file, last_section, verbose, buffer_size)
+    result = check_for_null(file, last_section, args.verbose, buffer_size)
 
-    print("Result: " + str(result))
+    if args.dir != False: # TODO Edit
+
+        print("Result: " + str(result))
+
+    return result
 
 
 def check_executable(last_section):
@@ -59,15 +65,20 @@ def parse_arguments():
         description="Parse a file for a RWX last section and determine if it contains a section of NULL bytes of a specified size")
 
     parser.add_argument("-f", "--file", dest="filename",
-                        help="Specify file to be scanned", metavar="<file>", required=True)
+                        help="Specify file to be scanned", metavar="<file>")
     parser.add_argument("-b", "--buffer", dest="buffer",
                         help="Specifies how many 0's to look for default is - Default is 800 bytes",
                         metavar="<buffSize>")
     parser.add_argument("-v", "--verbose",
                         help="Displays information regarding the PE File", action='store_true')
+    parser.add_argument("-d", "--dir", metavar="<dir>",
+                        help="Specify directory of files to scan")
+    parser.add_argument("-i", "--inputcsv", metavar="<path>",
+                        help="Specifies input CSV ")
+    parser.add_argument("-o", "--outputcsv", metavar="<path>",
+                        help="Specifies output CSV ")
 
     args = parser.parse_args()
-
 
     return args
 
@@ -122,12 +133,59 @@ def check_for_null(file, last_section, verbose, buffer_size):
             else:
                 contiguous_count = 0
 
-        print("Highest Occurence: " + str(highest_occurrences))
+        if verbose:
+            print("Highest Occurrence: " + str(highest_occurrences))
+
         if highest_occurrences > buffer_size:
             return True
-
+        else:
+            return False
     else:
         return False
+
+
+def CSV_handler(args):  # Adapted from TJ's code from yara classifier
+
+    global fieldnames
+    if not os.path.exists(args.inputcsv):
+        print("[-] ERROR: Input CSV file does not exist! ")
+        exit(2)
+    if not os.path.exists(args.dir):
+        print("[-] ERROR: Files directory does not exist! ")
+        exit(2)
+
+    with open(args.inputcsv) as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        if "Gaps In RWX" in reader.fieldnames:
+            fieldnames = reader.fieldnames
+        else:
+            fieldnames = reader.fieldnames + ['Gaps In RWX']
+
+        # Generate output file, version check to avoid Windows vs MAC output bug
+        if sys.version_info[0] == 2:
+            fileout = open(args.outputcsv, 'wb')
+        else:
+            fileout = open(args.outputcsv, 'w')
+
+        writer = csv.DictWriter(fileout, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for row in reader:
+            path = os.path.join(args.dir, row['SHA256'])
+            try:
+                result = file_handler(path, args)
+                if result == True:
+                    row['Gaps In RWX'] = "True"
+                elif result == False:
+                    row['Gaps In RWX'] = "False"
+
+            except Exception as e:
+                print ("Error Scanning: {0}".format(row['SHA256']))
+                print ("    {0}").format(e)
+            writer.writerow(row)
+        fileout.close()
+        print "Output written to {}".format(args.outputcsv)
 
 
 main()
