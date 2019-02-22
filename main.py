@@ -5,42 +5,39 @@ import sys
 
 import pefile
 
-# code for scanning files in directory
-# if os.path.isdir(args.file):
-#         for root, dirs, files in scandir.walk(args.file):
-#             for file in files:
-import rules as rules
-
-buffer_size = 800
-
 
 def main():
+    buffer_size = 800
+
     args = parse_arguments()  # Parses args for arguments
-    print("\n=================================================================")
-    print("Processing files, if specified, results will be in the output CSV")
-    print("      Default buffer size is 800 null bytes, -b to modify")
-    print("=================================================================\n")
-    if len(args.dir) < 1:
-        file = args.filename
-        file_handler(file, args)
-    else:
-        CSV_handler(args)
 
     if args.buffer > 0:
-        buffer_size.this = args.buffer
+        buffer_size = int(args.buffer)
+
+    buffer_size = buffer_size / 2  # This is done due to hex being parsed in pairs of 00's.
+
+    print("\n=================================================================")
+    print("Processing files, if specified, results will be in the output CSV")
+    print("      Default buffer size is 800 bytes null bytes, -b to modify")
+    print("=================================================================\n")
+
+    if len(args.dir) < 1:
+        file = args.filename
+        file_handler(file, args, buffer_size)
+
+    else:
+        CSV_handler(args, buffer_size)
 
 
-def file_handler(file, args):
+def file_handler(file, args, buffer_size):
     pe = pefile.PE(file)  # Takes the filename from command line argument and loads PE file
     num_sections = pe.FILE_HEADER.NumberOfSections
 
     last_section = pe.sections[num_sections - 1]  # gets the last section
     result = check_for_null(file, last_section, args.verbose, buffer_size)
 
-    if args.dir != False: # TODO Edit
-
+    if len(args.dir) > 1:
         print("Result: " + str(result))
-
     return result
 
 
@@ -101,6 +98,7 @@ def check_for_null(file, last_section, verbose, buffer_size):
     executable = check_writeable(last_section)
 
     if verbose:
+        print(file)
         print(last_section)
         print("Writeable: " + str(writeable))
         print("Executable: " + str(executable))
@@ -135,8 +133,9 @@ def check_for_null(file, last_section, verbose, buffer_size):
 
         if verbose:
             print("Highest Occurrence: " + str(highest_occurrences))
+            print(buffer_size)
 
-        if highest_occurrences > buffer_size:
+        if highest_occurrences >= buffer_size:
             return True
         else:
             return False
@@ -144,7 +143,7 @@ def check_for_null(file, last_section, verbose, buffer_size):
         return False
 
 
-def CSV_handler(args):  # Adapted from TJ's code from yara classifier
+def CSV_handler(args, buffer_size):  # Adapted from TJ's code from yara classifier
 
     global fieldnames
     if not os.path.exists(args.inputcsv):
@@ -174,10 +173,10 @@ def CSV_handler(args):  # Adapted from TJ's code from yara classifier
         for row in reader:
             path = os.path.join(args.dir, row['SHA256'])
             try:
-                result = file_handler(path, args)
-                if result == True:
+                result = file_handler(path, args, buffer_size)
+                if result:
                     row['Gaps In RWX'] = "True"
-                elif result == False:
+                elif not result:
                     row['Gaps In RWX'] = "False"
 
             except Exception as e:
