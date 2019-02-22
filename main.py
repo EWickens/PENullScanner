@@ -31,10 +31,13 @@ def main():
             last_section)):  # Checks to see if last section is writeable and executable
 
         '''If the section size is in effective Twos Compliment (i.e. 0xFFFFXXXX) then adjust size accordingly'''
-        if "0xF" not in hex(last_section.SizeOfRawData):
-            size = last_section.SizeOfRawData
-        else:
+        if "0xf" in hex(last_section.SizeOfRawData):
+            print("ENTERS")
+            print(hex(last_section.SizeOfRawData))
             size = 0xFFFFFFFF - last_section.SizeOfRawData
+        else:
+            print(hex(last_section.SizeOfRawData))
+            size = last_section.SizeOfRawData
 
         # Reads from the hex offset
         split_hex = read_from_hex_offset(args.filename, hex(last_section.PointerToRawData), size)
@@ -42,11 +45,12 @@ def main():
         # Converts into a list
         split_hex = list(split_hex)
 
+        # print(split_hex)
         contiguous_count = 0
         highest_occurrences = 0
 
         for val in split_hex:
-            if val == '0':
+            if val == '\x00':
                 contiguous_count += 1
 
                 if contiguous_count > highest_occurrences:
