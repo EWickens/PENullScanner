@@ -1,22 +1,22 @@
 <b>Parse a file for a RWX last section and determine if it contains a section of
 NULL bytes of a specified size</b>
 
-<line>usage: main.py [-h] [-f &ltfile&gt] [-b &ltbuffSize&gt] [-v] [-d &ltdir&gt] [-i &ltpath&gt][-o &ltpath&gt]</line>
+```usage: main.py [-h] [-f <file>] [-b <buffSize>] [-v] [-d <dir>] [-i <path>][-o <path>]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f &ltfile&gt, --file &ltfile&gt
+  -f <file>, --file <file>
                         Specify file to be scanned
-  -b &ltbuffSize&gt, --buffer &ltbuffSize&gt
+  -b <buffSize>, --buffer <buffSize>
                         Specifies how many 0's to look for default is -
                         Default is 800 bytes
   -v, --verbose         Displays information regarding the PE File
-  -d &ltdir&gt, --dir &ltdir&gt
+  -d <dir>, --dir <dir>
                         Specify directory of files to scan
-  -i &ltpath&gt, --inputcsv &ltpath&gt
+  -i <path>, --inputcsv <path>
                         Specifies input CSV
-  -o &ltpath&gt, --outputcsv &ltpath&gt
+  -o <path>, --outputcsv <path>
                         Specifies output CSV
 
-
-Example command: <i>--dir viri1/ -i Test.csv -o output.csv -b 400</i>
+```
+<b>Example command:</b> <i>--dir viri1/ -i Test.csv -o output.csv -b 400</i>
