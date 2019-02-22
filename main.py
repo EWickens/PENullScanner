@@ -97,8 +97,11 @@ def check_for_null(file, last_section, verbose, buffer_size):
     writeable = check_writeable(last_section)
     executable = check_writeable(last_section)
 
+    split = file.split('/', 1)[-1]
+    print("\n\nFileID: " + split)
+
     if verbose:
-        print(file)
+
         print(last_section)
         print("Writeable: " + str(writeable))
         print("Executable: " + str(executable))

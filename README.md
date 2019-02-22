@@ -1,8 +1,7 @@
 <b>Parse a file for a RWX last section and determine if it contains a section of
 NULL bytes of a specified size</b>
 
-usage: main.py [-h] [-f <file>] [-b <buffSize>] [-v] [-d <dir>] [-i <path>]
-               [-o <path>]
+<line>usage: main.py [-h] [-f <file>] [-b <buffSize>] [-v] [-d <dir>] [-i <path>][-o <path>]</line>
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -20,4 +19,4 @@ optional arguments:
                         Specifies output CSV
 
 
-Example command: --dir viri1/ -i Test.csv -o output.csv -b 400
+Example command: <i>--dir viri1/ -i Test.csv -o output.csv -b 400</i>
