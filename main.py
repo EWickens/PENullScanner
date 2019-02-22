@@ -25,19 +25,25 @@ def main():
     print("Writeable: " + str(check_writeable(last_section)))
     print("Executable: " + str(check_executable(last_section)))
 
+    print(last_section)
+
     if (check_writeable(last_section) and check_executable(
             last_section)):  # Checks to see if last section is writeable and executable
-        hex = binascii.hexlify(last_section.get_data())
-        print(hex)
-        split_hex = list(hex)
-        # print(split_hex)
-        print(len(split_hex))
+
+        '''If the section size is in effective Twos Compliment (i.e. 0xFFFFXXXX) then adjust size accordingly'''
+        if "0xF" not in hex(last_section.SizeOfRawData):
+            size = last_section.SizeOfRawData
+        else:
+            size = 0xFFFFFFFF - last_section.SizeOfRawData
+
+        # Reads from the hex offset
+        split_hex = read_from_hex_offset(args.filename, hex(last_section.PointerToRawData), size)
+
+        # Converts into a list
+        split_hex = list(split_hex)
 
         contiguous_count = 0
         highest_occurrences = 0
-
-        dump = last_section.dump()
-        print(dump)
 
         for val in split_hex:
             if val == '0':
@@ -80,11 +86,27 @@ def parse_arguments():
                         help="Specify file to be scanned", metavar="FILE")
     parser.add_argument("-b", "--buffer", dest="buffer",
                         help="Specifies how many 0's to look for default is ",
-                        metavar="BUFFER")  # TODO - DETERMINE DEFAULT NUMBER OF ZEROS & SET DEFAULT NUMBER
+                        metavar="BUFFER")
+
+
+    # TODO - DETERMINE DEFAULT NUMBER OF ZEROS & SET DEFAULT NUMBER
     # TODO ADD HELP TEXT
     args = parser.parse_args()
 
     return args
+
+
+def read_from_hex_offset(file, hex_offset, size):
+    file = open(file)
+
+    offset = int(hex_offset, base=16)
+    file.seek(offset, 0)
+
+    data = file.read(size)
+    with open("out.bin", 'wb') as outfile:
+        outfile.write(data)
+
+    return data
 
 
 main()
