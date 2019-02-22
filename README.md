@@ -1,7 +1,7 @@
 <b>Parse a file for a RWX last section and determine if it contains a section of
 NULL bytes of a specified size</b>
 
-<line>usage: main.py [-h] [-f <file>] [-b <buffSize>] [-v] [-d <dir>] [-i <path>][-o <path>]</line>
+<line>usage: main.py [-h] [-f <file>] [-b <buffSize>] [-v] [-d < dir >] [-i <path>][-o < path >]</line>
 
 optional arguments:
   -h, --help            show this help message and exit
