@@ -19,4 +19,4 @@ optional arguments:
                         Specifies output CSV
 
 ```
-<b>Example command:</b> <i>--dir viri1/ -i Test.csv -o output.csv -b 400</i>
+<b>Example command:</b> <i>python main.py --dir viri1/ -i Test.csv -o output.csv -b 400</i>
