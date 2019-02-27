@@ -2,7 +2,6 @@ import argparse
 import csv
 import os
 import sys
-
 import pefile
 
 
@@ -21,7 +20,7 @@ def main():
     print("      Default buffer size is 800 bytes null bytes, -b to modify")
     print("=================================================================\n")
 
-    if len(args.dir) < 1:
+    if args.filename is not None:
         file = args.filename
         file_handler(file, args, buffer_size)
 
@@ -36,8 +35,9 @@ def file_handler(file, args, buffer_size):
     last_section = pe.sections[num_sections - 1]  # gets the last section
     result = check_for_null(file, last_section, args.verbose, buffer_size)
 
-    if len(args.dir) > 1:
+    if args.dir is not None:
         print("Result: " + str(result))
+
     return result
 
 
