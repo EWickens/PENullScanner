@@ -21,7 +21,8 @@ optional arguments:
                         Specifies output CSV
 
 ```
-<b>Example command:</b> <i>python main.py --dir viri1/ -i Test.csv -o output.csv -b 400</i>
+<b>Example command:</b> 
+```<i>python main.py --dir viri1/ -i Test.csv -o output.csv -b 400</i>```
 
 <b>For optimal usage with distro:</b>
   - This tool performs its own check to detect if the last section of a file is Writeable and Executable, so it is not           completely necessary to filter out blanks in the distro.
