@@ -95,7 +95,7 @@ def read_from_hex_offset(file, hex_offset, size):
 
 def check_for_null(file, last_section, verbose, buffer_size):
     writeable = check_writeable(last_section)
-    executable = check_writeable(last_section)
+    executable = check_executable(last_section)
 
     split = file.split('/', 1)[-1]
     print("\n\nFileID: " + split)
