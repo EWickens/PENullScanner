@@ -30,8 +30,8 @@ optional arguments:
   - Better suited to large groupings on hosts where the host is known to be virally infected (For efficacy purposes)
   
 <b>False positives on:</b>
-  - Armadillo v1.7.1 -> I have a yara rule for this just ask
-  - HASP HL Protection V1.x -> Aladdin - I have a yara rule for this just ask
+  - Armadillo v1.7.1 -> <i>I have a yara rule for this just ask</i>
+  - HASP HL Protection V1.x -> Aladdin - <i>I have a yara rule for this just ask</i>
   - Armadillo V4.x
   - Some ASPack variants
   - PEPack
