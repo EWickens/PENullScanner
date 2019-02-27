@@ -87,8 +87,6 @@ def read_from_hex_offset(file, hex_offset, size):
     file.seek(offset, 0)
 
     data = file.read(size)
-    with open("out.bin", 'wb') as outfile:
-        outfile.write(data)
 
     return data
 
@@ -136,7 +134,6 @@ def check_for_null(file, last_section, verbose, buffer_size):
 
         if verbose:
             print("Highest Occurrence: " + str(highest_occurrences))
-            print(buffer_size)
 
         if highest_occurrences >= buffer_size:
             return True
