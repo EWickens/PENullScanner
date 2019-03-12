@@ -17,7 +17,7 @@ def main():
 
     print("\n=================================================================")
     print("Processing files, if specified, results will be in the output CSV")
-    print("      Default buffer size is 800 bytes null bytes, -b to modify")
+    print("     Default buffer size is 800 bytes null bytes, -b to modify")
     print("=================================================================\n")
 
     if args.filename is not None:
@@ -33,6 +33,10 @@ def file_handler(file, args, buffer_size):
     num_sections = pe.FILE_HEADER.NumberOfSections
 
     last_section = pe.sections[num_sections - 1]  # gets the last section
+
+    if last_section.SizeOfRawData == 0:
+        return "Empty"
+
     result = check_for_null(file, last_section, args.verbose, buffer_size)
 
     if args.dir is not None:
@@ -84,6 +88,7 @@ def read_from_hex_offset(file, hex_offset, size):
     file = open(file)
 
     offset = int(hex_offset, base=16)
+    print(hex_offset)
     file.seek(offset, 0)
 
     data = file.read(size)
@@ -178,6 +183,8 @@ def CSV_handler(args, buffer_size):  # Adapted from TJ's code from yara classifi
                     row['Gaps In RWX'] = "True"
                 elif not result:
                     row['Gaps In RWX'] = "False"
+                elif result == "Empty":
+                    row['Gaps In RWX'] = "Empty"
 
             except Exception as e:
                 print ("Error Scanning: {0}".format(row['SHA256']))
