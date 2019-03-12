@@ -36,13 +36,12 @@ def file_handler(file, args, buffer_size):
 
     if last_section.SizeOfRawData == 0:
         return False, "Empty"
+    else:
+        result = check_for_null(file, last_section, args.verbose, buffer_size)
 
-    result = check_for_null(file, last_section, args.verbose, buffer_size)
-
-    if args.dir is not None:
-        print("Result: " + str(result))
-
-    return result
+        if args.dir is not None:
+            print("Result: " + str(result))
+        return result, None
 
 
 def check_executable(last_section):
@@ -104,7 +103,6 @@ def check_for_null(file, last_section, verbose, buffer_size):
     print("\n\nFileID: " + split)
 
     if verbose:
-
         print(last_section)
         print("Writeable: " + str(writeable))
         print("Executable: " + str(executable))
@@ -179,12 +177,15 @@ def CSV_handler(args, buffer_size):  # Adapted from TJ's code from yara classifi
             path = os.path.join(args.dir, row['SHA256'])
             try:
                 result = file_handler(path, args, buffer_size)
-                if result[0]:
-                    row['Gaps In RWX'] = "True"
-                elif not result[0]:
-                    row['Gaps In RWX'] = "False"
-                elif result[0] == False and result[1] == "Empty":
+
+                if not result[0] and result[1] == "Empty":
                     row['Gaps In RWX'] = "Empty"
+                elif result[0] and result[1] is None:
+                    row['Gaps In RWX'] = "True"
+                elif not result[0] and result[1] is None:
+
+                    row['Gaps In RWX'] = "False"
+
 
             except Exception as e:
                 print ("Error Scanning: {0}".format(row['SHA256']))
