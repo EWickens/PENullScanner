@@ -35,7 +35,7 @@ def file_handler(file, args, buffer_size):
     last_section = pe.sections[num_sections - 1]  # gets the last section
 
     if last_section.SizeOfRawData == 0:
-        return "Empty"
+        return False, "Empty"
 
     result = check_for_null(file, last_section, args.verbose, buffer_size)
 
@@ -179,11 +179,11 @@ def CSV_handler(args, buffer_size):  # Adapted from TJ's code from yara classifi
             path = os.path.join(args.dir, row['SHA256'])
             try:
                 result = file_handler(path, args, buffer_size)
-                if result:
+                if result[0]:
                     row['Gaps In RWX'] = "True"
-                elif not result:
+                elif not result[0]:
                     row['Gaps In RWX'] = "False"
-                elif result == "Empty":
+                elif result[0] == False and result[1] == "Empty":
                     row['Gaps In RWX'] = "Empty"
 
             except Exception as e:
